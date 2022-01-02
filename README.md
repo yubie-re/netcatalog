@@ -1,2 +1,2 @@
 # netcatalog
-download the latest netcatalog
+download the latest gta v netcatalog
