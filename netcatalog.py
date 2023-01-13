@@ -2,14 +2,12 @@ import requests
 import zlib
 import json
 
-latest_known_ver = 829 # we can't get the latest catalog without ros access, so we need to make a method to find it
-while True: # loop through the versions until we hit a 404
-    result = requests.get('http://prod.cloud.rockstargames.com/titles/gta5/pcros/gamecatalog/Catalog_' + str(latest_known_ver) + '.zip')
-    if result.status_code == 404:
-        break
-    latest_known_ver += 1
-    last_real_result = result 
+rsaccess_token = "" # This needs to be dumped from the game (not to be confused with GSINFO, this will be a base64 blob)
+transaction_subdomain = "" # This needs to be dumped from the game, e.g prod.p01ewr.pod.rockstargames.com (this gets assigned to you)
 
-f = open('Catalog_' + str(latest_known_ver) + '.json', "w")
-f.write(json.dumps(json.loads(zlib.decompress(last_real_result._content, -15)), indent=4))
+result = requests.get("https://" + transaction_subdomain + "/gta5/11/GamePlayServices/GameTransactions.asmx/GetCatalog", headers={ "Authorization": "RSACCESS token=" + rsaccess_token })
+catalog = json.loads(zlib.decompress(result.content, -15))
+version = catalog["version"]
+f = open('Catalog_' + str(version) + '.json', "w")
+f.write(json.dumps(catalog, indent=4))
 f.close()
